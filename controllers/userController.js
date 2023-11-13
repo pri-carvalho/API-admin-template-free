@@ -4,9 +4,12 @@ const user = require('../models/user')
 
 exports.getUsers = (req, res, next) => {
     user.find()
-        .then(user => {
+        .then(usersFound => {
+            if (!usersFound) {
+                res.status(404).json({ error: 'Users not found' })
+            }
             res.status(200).json({
-                user: user
+                users: usersFound
             })
         })
         .catch(err => {
@@ -19,12 +22,13 @@ exports.getUsers = (req, res, next) => {
 
 exports.getUserId = (req, res, next) => {
     const id = req.params.id
+
     user.findById(id).select('-email -password')
-        .then((user) => {
-            if (!user) {
+        .then((userFound) => {
+            if (!userFound) {
                 res.status(404).json({ error: 'User not found' })
             }
-            res.status(200).json({ user })
+            res.status(200).json({ user: userFound })
         })
         .catch((err) => {
             if (!err.statusCode) {
@@ -35,11 +39,15 @@ exports.getUserId = (req, res, next) => {
 }
 
 exports.getUserProfile = (req, res, next) => {
-    const user = req.user.userId
-    user.findById(user)
-        .then((user) => {
+    const userId = req.user.userId
+
+    user.findById(userId)
+        .then((userFound) => {
+            if (!userFound) {
+                res.status(404).json({ error: 'User not found' })
+            }
             res.status(200).json({
-                user: user,
+                user: userFound,
             })
         })
         .catch((err) => {
@@ -52,20 +60,22 @@ exports.getUserProfile = (req, res, next) => {
 
 exports.putUserId = (req, res, next) => {
     const id = req.params.id
-    const user = req.user.userId
+    const userId = req.user.userId
 
-    user.findById(user)
-        .then((user) => {
-            if (user.isAdmin) {
+    user.findById(userId)
+        .then((userFound) => {
+            if (!userFound) {
+                res.status(404).json({ error: 'User not found' })
+            } else if (userFound.isAdmin) {
                 const updatedUser = {
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
                     email: req.body.email
                 }
                 user.findByIdAndUpdate(id, updatedUser, { new: true })
-                    .then((user) => {
+                    .then((userFound) => {
                         res.status(200).json({
-                            user: user,
+                            user: userFound,
                         })
                     })
                     .catch((err) => {
@@ -81,12 +91,14 @@ exports.putUserId = (req, res, next) => {
 }
 
 exports.deleteUserId = (req, res, next) => {
-    const user = req.user.userId
+    const userId = req.user.userId
     const id = req.params.id
 
-    user.findById(user)
-        .then((user) => {
-            if (user.isAdmin) {
+    user.findById(userId)
+        .then((userFound) => {
+            if (!userFound) {
+                res.status(404).json({ error: 'User not found' })
+            } else if (userFound.isAdmin) {
                 user.findByIdAndRemove(id)
                     .then(() => {
                         res.status(204).send()

@@ -1,12 +1,16 @@
 "use strict"
 
 const project = require('../models/project')
+const user = require('../models/user')
 
-exports.getprojects = (res, next) => {
+exports.getProjects = (req, res, next) => {
     project.find()
-        .then(project => {
+        .then(projectsFound => {
+            if (!projectsFound) {
+                res.status(404).json({ error: 'Projects not found' })
+            }
             res.status(200).json({
-                project: project
+                projects: projectsFound
             })
         })
         .catch(err => {
@@ -17,14 +21,14 @@ exports.getprojects = (res, next) => {
         })
 }
 
-exports.getprojectId = (req, res, next) => {
+exports.getProjectId = (req, res, next) => {
     const id = req.params.id
     project.findById(id)
-        .then((project) => {
-            if (!project) {
+        .then((projectFound) => {
+            if (!projectFound) {
                 res.status(404).json({ error: 'Project not found' })
             }
-            res.status(200).json({ project })
+            res.status(200).json({ project: projectFound })
         })
         .catch((err) => {
             if (!err.statusCode) {
@@ -34,13 +38,52 @@ exports.getprojectId = (req, res, next) => {
         })
 }
 
-exports.putprojectId = (req, res, next) => {
-    const id = req.params.id
-    const user = req.user.userId
+exports.postProject = (req, res, next) => {
+    const { title, description, portfolioImgUrl, portfolioProjectImgUrl } = req.body
+    const userId = req.user.userId
 
-    user.findById(user)
-        .then((user) => {
-            if (user.isAdmin) {
+    user.findById(userId)
+        .then((userFound) => {
+            if (!userFound) {
+                res.status(404).json({ error: 'User not found' })
+            } else if (userFound.isAdmin) {
+                const newProject = new project({
+                    title: title,
+                    description: description,
+                    portfolioImgUrl: portfolioImgUrl,
+                    portfolioProjectImgUrl: portfolioProjectImgUrl,
+                })
+                newProject.save(newProject)
+                    .then((projectFound) => {
+                        res.status(201).json({
+                            project: projectFound,
+                        })
+                    })
+                    .catch((err) => {
+                        if (!err.statusCode) {
+                            err.statusCode = 500
+                        }
+                        next(err)
+                    })
+            }
+        })
+        .catch((err) => {
+            if (!err.statusCode) {
+                err.statusCode = 500
+            }
+            next(err)
+        })
+}
+
+exports.putProjectId = (req, res, next) => {
+    const id = req.params.id
+    const userId = req.user.userId
+
+    user.findById(userId)
+        .then((userFound) => {
+            if (!userFound) {
+                res.status(404).json({ error: 'User not found' })
+            } else if (userFound.isAdmin) {
                 const updatedProject = {
                     title: req.body.title,
                     description: req.body.description,
@@ -48,9 +91,9 @@ exports.putprojectId = (req, res, next) => {
                     portfolioProjectImgUrl: req.body.portfolioProjectImgUrl,
                 }
                 project.findByIdAndUpdate(id, updatedProject, { new: true })
-                    .then((project) => {
+                    .then((projectFound) => {
                         res.status(200).json({
-                            project: project,
+                            project: projectFound,
                         })
                     })
                     .catch((err) => {
@@ -65,13 +108,13 @@ exports.putprojectId = (req, res, next) => {
         })
 }
 
-exports.deleteprojectId = (req, res, next) => {
-    const user = req.user.userId
+exports.deleteProjectId = (req, res, next) => {
+    const userId = req.user.userId
     const id = req.params.id
 
-    user.findById(user)
-        .then((user) => {
-            if (user.isAdmin) {
+    user.findById(userId)
+        .then((userFound) => {
+            if (userFound.isAdmin) {
                 project.findByIdAndRemove(id)
                     .then(() => {
                         res.status(204).send()

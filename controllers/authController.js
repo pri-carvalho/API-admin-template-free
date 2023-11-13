@@ -8,16 +8,16 @@ dotenv.config()
 
 exports.postLogin = (req, res, next) => {
     const { email, password } = req.body
-    let user
+    let userFound
     user.findOne({ email })
-        .then((userFound) => {
-            if (!userFound) {
+        .then((user) => {
+            if (!user) {
                 const error = new Error('User not found')
                 error.statusCode = 404
                 throw error
             }
-            user = userFound
-            return bcrypt.compare(password, user.password)
+            userFound = user
+            return bcrypt.compare(password, userFound.password)
         })
         .then(valid => {
             if (!valid) {
@@ -27,9 +27,9 @@ exports.postLogin = (req, res, next) => {
             }
             const token = jwt.sign(
                 {
-                    email: user.email,
-                    name: user.name,
-                    userId: user._id.toString()
+                    email: userFound.email,
+                    name: userFound.name,
+                    userId: userFound._id.toString()
                 },
                 process.env.SECRET_JWT,
                 { expiresIn: '1h' }
