@@ -55,8 +55,7 @@ exports.postSignup = (req, res, next) => {
                         lastname: lastname,
                         email: email,
                         password: hashedPassword,
-                        isAdmin: false,
-                        cart: [],
+                        isAdmin: false
                     })
                     return newUser.save()
                 })
