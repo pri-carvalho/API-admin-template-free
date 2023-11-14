@@ -114,7 +114,9 @@ exports.deleteProjectId = (req, res, next) => {
 
     user.findById(userId)
         .then((userFound) => {
-            if (userFound.isAdmin) {
+            if (!userFound) {
+                res.status(404).json({ error: 'User not found' })
+            } else if (userFound.isAdmin) {
                 project.findByIdAndRemove(id)
                     .then(() => {
                         res.status(204).send()
