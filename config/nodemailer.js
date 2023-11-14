@@ -16,16 +16,16 @@ const transport = nodemailer.createTransport({
   }
 })
 
-const sendEmail = (firstName, lastName, email, content, phoneNumber, subject) => {
-  transport.sendMail({
+const sendEmail = (firstName, lastName, email, content, phoneNumber, subject, address) => {
+  return transport.sendMail({
     from: email,
     to: 'test@test.ca',
     subject: subject,
-    html: `<h2>Message de ${lastName + firstName}, téléphone : ${phoneNumber}</h2>
+    html: `<h2>Message de ${lastName + firstName}</h2>
     <h3>Adresse : ${address}</h3>
+    <h4>téléphone : ${phoneNumber}</h4>
           <p>${content}</p>`
   })
-    .catch(err => console.log(err))
 }
 
 exports.sendEmail = sendEmail

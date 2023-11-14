@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const authRoutes = require('./routes/auth')
 const projectRoutes = require('./routes/project')
 const userRoutes = require('./routes/user')
+const contactRoutes = require('./routes/contact')
 const errorController = require('./controllers/errorController')
 
 app.use((req, res, next) => {
@@ -23,6 +24,7 @@ app.use(express.urlencoded({
 }))
 app.use(authRoutes)
 app.use(userRoutes)
+app.use(contactRoutes)
 app.use(projectRoutes)
 app.use(errorController.getError)
 app.use(errorController.logErrors)
