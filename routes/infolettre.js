@@ -5,10 +5,10 @@ const router = express.Router();
 const infolettreController = require('../controllers/infolettreController');
 const isAuth = require('../middleware/is-auth');
 
-router.get('/infolettres', infolettreController.getinfolettres)
-router.get('/infolettre/:id', infolettreController.getinfolettreId)
-router.post('/infolettre', isAuth, infolettreController.postinfolettre)
-router.put('/infolettre/:id', isAuth, infolettreController.putinfolettreId)
-router.delete('/infolettre/:id', isAuth, infolettreController.deleteinfolettreId)
+router.get('/infolettres', isAuth, infolettreController.getInfolettres)
+router.get('/infolettre/:id', isAuth, infolettreController.getInfolettreId)
+router.post('/infolettre', isAuth, infolettreController.postInfolettre)
+router.put('/infolettre/:id', isAuth, infolettreController.putInfolettreId)
+router.delete('/infolettre/:id', isAuth, infolettreController.deleteInfolettreId)
 
 module.exports = router;
