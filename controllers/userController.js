@@ -40,7 +40,7 @@ exports.getUserId = (req, res, next) => {
             if (!userFound) {
                 res.status(404).json({ error: 'User not connected' })
             } else if (userFound.isAdmin) {
-                user.findById(id).select('-email -password')
+                user.findById(id).select('-password')
                     .then((userFound) => {
                         if (!userFound) {
                             res.status(404).json({ error: 'User not found' })
