@@ -10,7 +10,7 @@ exports.getUsers = (req, res, next) => {
             if (!userFound) {
                 res.status(404).json({ error: 'User not connected' })
             } else if (userFound.isAdmin) {
-                user.find()
+                user.find().select('-password')
                     .then(usersFound => {
                         if (!usersFound) {
                             res.status(404).json({ error: 'Users not found' })
@@ -62,7 +62,7 @@ exports.getUserId = (req, res, next) => {
 exports.getUserProfile = (req, res, next) => {
     const userId = req.user.userId
 
-    user.findById(userId)
+    user.findById(userId).select('-password')
         .then((userFound) => {
             if (!userFound) {
                 res.status(404).json({ error: 'User not connected' })
