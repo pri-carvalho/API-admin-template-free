@@ -50,29 +50,15 @@ exports.getInfolettreId = (req, res, next) => {
 
 exports.postInfolettre = (req, res, next) => {
     const { email } = req.body
-    const userId = req.user.userId
 
-    user.findById(userId)
-        .then((userFound) => {
-            if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
-            } else if (userFound.isAdmin) {
-                const newInfolettre = new infolettre({
-                    email: email
-                })
-                newInfolettre.save(newInfolettre)
-                    .then((infolettreFound) => {
-                        res.status(201).json({
-                            infolettre: infolettreFound,
-                        })
-                    })
-                    .catch((err) => {
-                        if (!err.statusCode) {
-                            err.statusCode = 500
-                        }
-                        next(err)
-                    })
-            }
+    const newInfolettre = new infolettre({
+        email: email
+    })
+    newInfolettre.save(newInfolettre)
+        .then((infolettreFound) => {
+            res.status(201).json({
+                infolettre: infolettreFound,
+            })
         })
         .catch((err) => {
             if (!err.statusCode) {
