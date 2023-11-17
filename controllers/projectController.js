@@ -23,6 +23,7 @@ exports.getProjects = (req, res, next) => {
 
 exports.getProjectId = (req, res, next) => {
     const id = req.params.id
+
     project.findById(id)
         .then((projectFound) => {
             if (!projectFound) {
@@ -45,7 +46,7 @@ exports.postProject = (req, res, next) => {
     user.findById(userId)
         .then((userFound) => {
             if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
+                res.status(404).json({ error: 'User not connected' })
             } else if (userFound.isAdmin) {
                 const newProject = new project({
                     title: title,
@@ -65,14 +66,11 @@ exports.postProject = (req, res, next) => {
                         }
                         next(err)
                     })
+            } else {
+                res.status(403).json('Unauthorized')
             }
         })
-        .catch((err) => {
-            if (!err.statusCode) {
-                err.statusCode = 500
-            }
-            next(err)
-        })
+
 }
 
 exports.putProjectId = (req, res, next) => {
@@ -82,7 +80,7 @@ exports.putProjectId = (req, res, next) => {
     user.findById(userId)
         .then((userFound) => {
             if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
+                res.status(404).json({ error: 'User not connected' })
             } else if (userFound.isAdmin) {
                 const updatedProject = {
                     title: req.body.title,
@@ -115,7 +113,7 @@ exports.deleteProjectId = (req, res, next) => {
     user.findById(userId)
         .then((userFound) => {
             if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
+                res.status(404).json({ error: 'User not connected' })
             } else if (userFound.isAdmin) {
                 project.findByIdAndRemove(id)
                     .then(() => {

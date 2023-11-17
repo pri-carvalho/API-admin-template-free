@@ -3,48 +3,69 @@
 const user = require('../models/user')
 
 exports.getUsers = (req, res, next) => {
-    user.find()
-        .then(usersFound => {
-            if (!usersFound) {
-                res.status(404).json({ error: 'Users not found' })
+    const userId = req.user.userId
+
+    user.findById(userId)
+        .then((userFound) => {
+            if (!userFound) {
+                res.status(404).json({ error: 'User not connected' })
+            } else if (userFound.isAdmin) {
+                user.find().select('-password')
+                    .then(usersFound => {
+                        if (!usersFound) {
+                            res.status(404).json({ error: 'Users not found' })
+                        }
+                        res.status(200).json({
+                            users: usersFound
+                        })
+                    })
+                    .catch(err => {
+                        if (!err.statusCode) {
+                            err.statusCode = 500
+                        }
+                        next(err)
+                    })
+            } else {
+                res.status(403).json('Unauthorized')
             }
-            res.status(200).json({
-                users: usersFound
-            })
-        })
-        .catch(err => {
-            if (!err.statusCode) {
-                err.statusCode = 500
-            }
-            next(err)
         })
 }
 
 exports.getUserId = (req, res, next) => {
     const id = req.params.id
+    const userId = req.user.userId
 
-    user.findById(id).select('-email -password')
+    user.findById(userId)
         .then((userFound) => {
             if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
+                res.status(404).json({ error: 'User not connected' })
+            } else if (userFound.isAdmin) {
+                user.findById(id).select('-password')
+                    .then((userFound) => {
+                        if (!userFound) {
+                            res.status(404).json({ error: 'User not found' })
+                        }
+                        res.status(200).json({ user: userFound })
+                    })
+                    .catch((err) => {
+                        if (!err.statusCode) {
+                            err.statusCode = 500
+                        }
+                        next(err)
+                    })
+            } else {
+                res.status(403).json('Unauthorized')
             }
-            res.status(200).json({ user: userFound })
-        })
-        .catch((err) => {
-            if (!err.statusCode) {
-                err.statusCode = 500
-            }
-            next(err)
         })
 }
 
 exports.getUserProfile = (req, res, next) => {
     const userId = req.user.userId
 
-    user.findById(userId)
+    user.findById(userId).select('-password')
         .then((userFound) => {
             if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
+                res.status(404).json({ error: 'User not connected' })
             }
             res.status(200).json({
                 user: userFound,
@@ -65,8 +86,8 @@ exports.putUserId = (req, res, next) => {
     user.findById(userId)
         .then((userFound) => {
             if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
-            } else if (userFound.isAdmin) {
+                res.status(404).json({ error: 'User not connected' })
+            } else if (userFound.isAdmin || userId === id) {
                 const updatedUser = {
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
@@ -91,13 +112,13 @@ exports.putUserId = (req, res, next) => {
 }
 
 exports.deleteUserId = (req, res, next) => {
-    const userId = req.user.userId
     const id = req.params.id
+    const userId = req.user.userId
 
     user.findById(userId)
         .then((userFound) => {
             if (!userFound) {
-                res.status(404).json({ error: 'User not found' })
+                res.status(404).json({ error: 'User not connected' })
             } else if (userFound.isAdmin) {
                 user.findByIdAndRemove(id)
                     .then(() => {
