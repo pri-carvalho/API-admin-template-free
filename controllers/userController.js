@@ -87,7 +87,7 @@ exports.putUserId = (req, res, next) => {
         .then((userFound) => {
             if (!userFound) {
                 res.status(404).json({ error: 'User not connected' })
-            } else if (userFound.isAdmin) {
+            } else if (userFound.isAdmin || userId === id) {
                 const updatedUser = {
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
