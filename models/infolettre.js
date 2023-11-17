@@ -13,4 +13,4 @@ const infolettre = new Schema({
     { timestamps: true }
 )
 
-module.exports = mongoose.model('project', project)
+module.exports = mongoose.model('infolettre', infolettre)
