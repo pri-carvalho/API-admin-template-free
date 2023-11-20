@@ -21,7 +21,7 @@ const sendEmail = (firstName, lastName, email, content, phoneNumber, subject, ad
     from: email,
     to: 'test@test.ca',
     subject: subject,
-    html: `<h2>Message de ${lastName} + " " + ${firstName}</h2>
+    html: `<h2>Message de ${lastName} ${firstName}</h2>
     <h3>Adresse : ${address}</h3>
     <h4>téléphone : ${phoneNumber}</h4>
           <p>${content}</p>`
