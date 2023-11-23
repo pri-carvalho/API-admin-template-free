@@ -26,7 +26,9 @@ const user = new Schema({
     },
     password: {
         type: String,
-        required: [true],
+        required: function () {
+            return this.isNew;
+        },
         minLength: 6
     },
     isAdmin: {
