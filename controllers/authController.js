@@ -43,50 +43,98 @@ exports.postLogin = (req, res, next) => {
 
 exports.postSignup = (req, res, next) => {
     const { firstname, lastname, email, password } = req.body
-    const userId = req.user.userId
 
-    user.findById(userId)
-        .then((userFound) => {
-            if (!userFound) {
-                res.status(404).json({ error: 'User not connected' })
-            } else if (userFound.isAdmin) {
-                user.findOne({ email })
-                    .then((existingUser) => {
-                        if (existingUser) {
-                            return res.status(409).json({ error: 'Email already exists' })
-                        }
-                        bcrypt.hash(password, 10)
-                            .then((hashedPassword) => {
-                                const newUser = new user({
-                                    firstname: firstname,
-                                    lastname: lastname,
-                                    email: email,
-                                    password: hashedPassword,
-                                    isAdmin: false
-                                })
-                                return newUser.save()
-                            })
-                            .then((createdUser) => {
-                                res.status(201).json({
-                                    message: 'User created successfully',
-                                    userId: createdUser.id,
-                                })
-                            })
-                            .catch((err) => {
-                                if (!err.statusCode) {
-                                    err.statusCode = 500
-                                }
-                                next(err)
-                            })
-                    })
-                    .catch((err) => {
-                        if (!err.statusCode) {
-                            err.statusCode = 500
-                        }
-                        next(err)
-                    })
-            } else {
-                res.status(403).json('Unauthorized')
+    user.findOne({ email })
+        .then((existingUser) => {
+            if (existingUser) {
+                return res.status(409).json({ error: 'Email already exists' })
             }
+            bcrypt.hash(password, 10)
+                .then((hashedPassword) => {
+                    const newUser = new user({
+                        firstname: firstname,
+                        lastname: lastname,
+                        email: email,
+                        password: hashedPassword,
+                        isAdmin: false
+                    })
+                    return newUser.save()
+                })
+                .then((createdUser) => {
+                    res.status(201).json({
+                        message: 'User created successfully',
+                        userId: createdUser.id,
+                    })
+                })
+                .catch((err) => {
+                    if (!err.statusCode) {
+                        err.statusCode = 500
+                    }
+                    next(err)
+                })
+        })
+        .catch((err) => {
+            if (!err.statusCode) {
+                err.statusCode = 500
+            }
+            next(err)
         })
 }
+
+
+// exports.postSignup = (req, res, next) => {
+//     const { firstname, lastname, email, password } = req.body
+//     const userId = req.user.userId
+
+//     user.findById(userId)
+//         .then((userFound) => {
+//             if (!userFound) {
+//                 res.status(404).json({ error: 'User not connected' })
+//             } else if (userFound.isAdmin) {
+//                 user.findOne({ email })
+//                     .then((existingUser) => {
+//                         if (existingUser) {
+//                             return res.status(409).json({ error: 'Email already exists' })
+//                         }
+//                         bcrypt.hash(password, 10)
+//                             .then((hashedPassword) => {
+//                                 const newUser = new user({
+//                                     firstname: firstname,
+//                                     lastname: lastname,
+//                                     email: email,
+//                                     password: hashedPassword,
+//                                     isAdmin: false
+//                                 })
+//                                 return newUser.save()
+//                             })
+//                             .then((createdUser) => {
+//                                 res.status(201).json({
+//                                     message: 'User created successfully',
+//                                     userId: createdUser.id,
+//                                 })
+//                             })
+//                             .catch((err) => {
+//                                 if (!err.statusCode) {
+//                                     err.statusCode = 500
+//                                 }
+//                                 next(err)
+//                             })
+//                     })
+//                     .catch((err) => {
+//                         if (!err.statusCode) {
+//                             err.statusCode = 500
+//                         }
+//                         next(err)
+//                     })
+//             } else {
+//                 res.status(403).json('Unauthorized')
+//             }
+//         })
+// }
+
+
+
+
+
+
+

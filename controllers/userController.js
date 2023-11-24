@@ -1,6 +1,7 @@
 "use strict"
 
 const user = require('../models/user')
+const bcrypt = require('bcrypt')
 
 exports.getUsers = (req, res, next) => {
     const userId = req.user.userId
@@ -88,23 +89,53 @@ exports.putUserId = (req, res, next) => {
             if (!userFound) {
                 res.status(404).json({ error: 'User not connected' })
             } else if (userFound.isAdmin || userId === id) {
-                const updatedUser = {
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    email: req.body.email
-                }
-                user.findByIdAndUpdate(id, updatedUser, { new: true })
-                    .then((userFound) => {
-                        res.status(200).json({
-                            user: userFound,
+                if (req.body.password) {
+                    bcrypt.hash(req.body.password, 10)
+                        .then((hashedPassword) => {
+                            const updatedUser = {
+                                firstname: req.body.firstname,
+                                lastname: req.body.lastname,
+                                email: req.body.email,
+                                password: hashedPassword
+                            }
+                            user.findByIdAndUpdate(id, updatedUser, { new: true })
+                                .then((userFound) => {
+                                    res.status(200).json({
+                                        user: userFound,
+                                    })
+                                })
+                                .catch((err) => {
+                                    if (!err.statusCode) {
+                                        err.statusCode = 500
+                                    }
+                                    next(err)
+                                })
                         })
-                    })
-                    .catch((err) => {
-                        if (!err.statusCode) {
-                            err.statusCode = 500
-                        }
-                        next(err)
-                    })
+                        .catch((err) => {
+                            if (!err.statusCode) {
+                                err.statusCode = 500
+                            }
+                            next(err)
+                        })
+                } else {
+                    const updatedUser = {
+                        firstname: req.body.firstname,
+                        lastname: req.body.lastname,
+                        email: req.body.email
+                    }
+                    user.findByIdAndUpdate(id, updatedUser, { new: true })
+                        .then((userFound) => {
+                            res.status(200).json({
+                                user: userFound,
+                            })
+                        })
+                        .catch((err) => {
+                            if (!err.statusCode) {
+                                err.statusCode = 500
+                            }
+                            next(err)
+                        })
+                }
             } else {
                 res.status(403).json('Unauthorized')
             }
