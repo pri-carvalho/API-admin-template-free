@@ -42,7 +42,7 @@ exports.postLogin = (req, res, next) => {
 }
 
 exports.postSignup = (req, res, next) => {
-    const { firstname, lastname, email, password } = req.body
+    const { firstName, lastName, email, password } = req.body
 
     user.findOne({ email })
         .then((existingUser) => {
@@ -52,8 +52,8 @@ exports.postSignup = (req, res, next) => {
             bcrypt.hash(password, 10)
                 .then((hashedPassword) => {
                     const newUser = new user({
-                        firstname: firstname,
-                        lastname: lastname,
+                        firstName: firstName,
+                        lastName: lastName,
                         email: email,
                         password: hashedPassword,
                         isAdmin: false

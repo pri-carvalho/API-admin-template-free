@@ -18,11 +18,12 @@ app.use((req, res, next) => {
         'OPTIONS, GET, POST, PUT, PATCH, DELETE'
     )
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     next()
 })
 app.use(cors({
     origin: 'http://localhost:3000'
-  }))
+}))
 app.use(express.json())
 app.use(express.urlencoded({
     extended: false
