@@ -7,7 +7,7 @@ const infolettre = new Schema({
         required: [true],
         maxLength: 50,
         unique: true,
-        match: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/
+        match: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)$/
     }
 },
     { timestamps: true }

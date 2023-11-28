@@ -5,13 +5,13 @@ const bcrypt = require('bcrypt');
 
 
 const user = new Schema({
-    firstname: {
+    firstName: {
         type: String,
         required: [true],
         minLength: 3,
         maxLength: 50
     },
-    lastname: {
+    lastName: {
         type: String,
         required: [true],
         minLength: 3,
