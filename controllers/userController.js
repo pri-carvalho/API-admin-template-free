@@ -93,8 +93,8 @@ exports.putUserId = (req, res, next) => {
                     bcrypt.hash(req.body.password, 10)
                         .then((hashedPassword) => {
                             const updatedUser = {
-                                firstname: req.body.firstname,
-                                lastname: req.body.lastname,
+                                firstName: req.body.firstName,
+                                lastName: req.body.lastName,
                                 email: req.body.email,
                                 password: hashedPassword
                             }
@@ -119,8 +119,8 @@ exports.putUserId = (req, res, next) => {
                         })
                 } else {
                     const updatedUser = {
-                        firstname: req.body.firstname,
-                        lastname: req.body.lastname,
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName,
                         email: req.body.email
                     }
                     user.findByIdAndUpdate(id, updatedUser, { new: true })
