@@ -22,7 +22,7 @@ app.use((req, res, next) => {
     next()
 })
 app.use(cors({
-    origin: 'https://projet-nadame.vercel.app/'
+    origin: ['https://projet-nadame.vercel.app', 'http://localhost:3000']
 }))
 app.use(express.json())
 app.use(express.urlencoded({
